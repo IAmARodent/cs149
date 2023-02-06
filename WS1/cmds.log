@@ -1,0 +1,20 @@
+  308  cd Desktop/
+  309  cd cs149/
+  310  cd WS1/
+  311  gcc 1_15.c 
+  312  ls
+  313  ./a.out
+  314  gcc 1_16.c
+  315  ./a.out
+  316  gcc 1_17.c
+  317  ./a.out
+  318  gcc 1_17.c
+  319  ls
+  320  ./a.out
+  321  gcc 1_18.c
+  322  ./a.out 
+  323  gcc 1_19.c
+  324  ./a.out 
+  325  gcc 1_20.c
+  326  ./a.out
+  327  history > cmds.log
