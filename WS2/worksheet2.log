@@ -1,0 +1,31 @@
+  389  date
+  390  cd cs149/
+  391  mkdir WS2
+  392  cd WS2/
+  393  echo$?
+  394  echo $?
+  395  cd ../
+  396  cd WS2/
+  397  echo $?
+  398  man ps
+  399  clear
+  400  cd Desktop/
+  401  cd cs149/
+  402  ls
+  403  cd WS2
+  404  ls
+  405  gcc 2_25.c 
+  406  ls
+  407  gcc a.out 
+  408  gcc 2_25.c 
+  409  ls
+  410  ./a.out 
+  411  gcc 2_29.c 
+  412  gcc --version
+  413  gcc 2_32.c 
+  414  ./a.out 
+  415  gcc 2_34.c 
+  416  ./a.out 
+  417  gcc 3_22.c 
+  418  ./a.out 
+  419  history > worksheet2.log
