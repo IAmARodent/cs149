@@ -5,15 +5,14 @@ int main(void)
     FILE *names;
     names = fopen("names.txt", "r");
 
-    char allNames[100][30];
-    char uniqueNames[100][30];
+    char allNames[1000][30];
+    char uniqueNames[1000][30];
     int uniqueNamesCounter = 1;
     int duplicate = 0;
     int test = 1;
-    int uniqueNamesCounterArray[100];
+    int uniqueNamesCounterArray[1000];
 
     char line[30];
-    char tempLine[30];
     char emptyString[] = "\n";
     int nameCounter = 0;
     while (NULL != fgets(line, 30, names))
@@ -24,10 +23,10 @@ int main(void)
         }
         else
         {
+            char tempLine[30];
             strncpy(tempLine, line, strlen(line)-1);
-            strcpy(line, tempLine);
-            printf("%s    %s\n", tempLine, line);
             strcpy(allNames[nameCounter], tempLine);
+            memset(tempLine, 0, 30);
             nameCounter++;
         }
     }
@@ -67,9 +66,9 @@ int main(void)
         }
         uniqueNamesCounterArray[i] = counter;
     }
-    //for(int i = 0; i < uniqueNamesCounter; i++)
-    //{
-      //  printf("%s: %d\n", uniqueNames[i], uniqueNamesCounterArray[i]);
-    //}
+    for(int i = 0; i < uniqueNamesCounter; i++)
+    {
+        printf("%s: %d\n", uniqueNames[i], uniqueNamesCounterArray[i]);
+    }
     return 0;
 }
