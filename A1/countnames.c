@@ -13,6 +13,7 @@ int main(void)
     int uniqueNamesCounterArray[100];
 
     char line[30];
+    char tempLine[30];
     char emptyString[] = "\n";
     int nameCounter = 0;
     while (NULL != fgets(line, 30, names))
@@ -23,7 +24,10 @@ int main(void)
         }
         else
         {
-            strcpy(allNames[nameCounter], line);
+            strncpy(tempLine, line, strlen(line)-1);
+            strcpy(line, tempLine);
+            printf("%s    %s\n", tempLine, line);
+            strcpy(allNames[nameCounter], tempLine);
             nameCounter++;
         }
     }
@@ -63,9 +67,9 @@ int main(void)
         }
         uniqueNamesCounterArray[i] = counter;
     }
-    for(int i = 0; i < uniqueNamesCounter; i++)
-    {
-        printf("%s%d", uniqueNames[i], i);
-    }
+    //for(int i = 0; i < uniqueNamesCounter; i++)
+    //{
+      //  printf("%s: %d\n", uniqueNames[i], uniqueNamesCounterArray[i]);
+    //}
     return 0;
 }
