@@ -1,14 +1,30 @@
+/**
+* Description: Program that reads a txt file and reads all the names in the files.
+* Author names: Geronimo A
+* Last modified date: 2/20/2023
+* Creation date: 2/20/2023
+*/
 #include <stdio.h>
 #include <string.h>
 /**
- * Main method that reads a file named names.txt and reads all the names in the file. 
+ * Main method that reads a txt file and reads all the names in the file. 
  * The names are then counted one by one to see which names are outputted the most and prints the frequency of each name in the console.
 */
-int main(void)
+int main(int argc, char *argv[])
 {
     //opens the file in read mode
+    if(argv[1] == NULL)
+    {
+        return 0;
+    }
     FILE *names;
-    names = fopen("names.txt", "r");
+    names = fopen(argv[1], "r");
+    //check if file exists
+    if(names == NULL)
+    {
+        fprintf(stderr, "Warning - File %s cannot be read or found\n", argv[0]);
+        return 1;
+    }
     //array for names and unique names
     char allNames[1000][30];
     char uniqueNames[1000][30];
@@ -23,13 +39,15 @@ int main(void)
     char line[30];
     char emptyString[] = "\n";
     int nameCounter = 0;
+    int lineCounter = 1;
     //reads the names of the file and puts it into allNames array until there are no more lines left
     while (NULL != fgets(line, 30, names))
     {
         //if line is empty notify user
         if (strcmp(line, emptyString) == 0)
         {
-            printf("Line %d empty.\n", nameCounter + 1);
+            fprintf(stderr, "Warning- Line %d empty.\n", lineCounter);
+            lineCounter++;
         }
         //else put name in allNamesArray
         else
@@ -48,6 +66,7 @@ int main(void)
                 strcpy(allNames[nameCounter], tempLine);
                 memset(tempLine, 0, 30);
                 nameCounter++;
+                lineCounter++;
             }
         }
     }
@@ -98,5 +117,6 @@ int main(void)
     {
         printf("%s: %d\n", uniqueNames[i], uniqueNamesCounterArray[i]);
     }
+    fclose(names);
     return 0;
 }
