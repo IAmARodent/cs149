@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     char uniqueNames[1000][30];
     //counts the number of names existing in the uniqueNamesArray
     int uniqueNamesCounter = 1;
-    //duplicate and test used as booleans in creating the uniqueNamesArray within conditions
+    //duplicate and doesntExistInUnique used as booleans in creating the uniqueNamesArray within conditions
     int duplicate = 0;
     int doesntExistInUnique = 1;
     //works in tandem with uniqueNames array to display amount of each unique name
