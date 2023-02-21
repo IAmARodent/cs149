@@ -1,0 +1,28 @@
+  863  cd Desktop/cs149/WS3/
+  864  ls
+  865  gcc 4_14.c 
+  866  ./a.out 
+  867  gcc 4_15.c
+  868  gcc 4_16.c 
+  869  ./a.out 
+  870  gcc 4_16.c
+  871  ./a.out 
+  872  gcc 4_14.c -Wall -Werror
+  873  gcc 4_16.c -Wall -Werror
+  874  gcc 5_16.c -Wall -Werror
+  875  gcc 5_17.c -Wall -Werror
+  876  gcc 5_18.c -Wall -Werror
+  877  gcc 5_21.c -Wall -Werror
+  878  gcc 5_22.c -Wall -Werror
+  879  gcc 5_23.c -Wall -Werror
+  880  wget https://github.com/torvalds/linux/archive/master.zip
+  881  unzip master.zip
+  882  cd linux-master
+  883  pwd
+  884  alias l='ls -latr'
+  885  l
+  886  find . -name mem.c
+  887  find . -name mem.c | xargs head
+  888  find . -name mem.c | xargs grep 86
+  889  cd ../
+  890  history > worksheet3.log
