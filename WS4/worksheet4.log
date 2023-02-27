@@ -1,0 +1,31 @@
+  936  ps -x
+  937  ps
+  938  cd Desktop/cs149/WS4/
+  939  ls
+  940  gcc 6_20.c -Wall -Werror
+  941  ./a.out 
+  942  gcc 6_30.c -Wall -Werror
+  943  ./a.out 
+  944  ps
+  945  ps -x
+  946  clear
+  947  pwd
+  948  pstree
+  949  clear
+  950  ps -a -f -x
+  951  ps -a -f -x | more
+  952  clear
+  953  top
+  954  man kill
+  955  echo $?
+  956  echo $$
+  957  ps
+  958  wget http://www.apuebook.com/src.3e.tar.gz
+  959  gunzip src.3e.tar.gz
+  960  tar xvf src.3e.tar
+  961  cd apue.3e
+  962  cd proc
+  963  make all
+  964  ./fork1
+  965  ./fork2
+  966  history > worksheet4.log
