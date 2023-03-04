@@ -6,28 +6,21 @@
 */
 #include <stdio.h>
 #include <string.h>
-
-/**
- * Main method that reads a txt file and reads all the names in the file. 
- * The names are then counted one by one to see which names are outputted the most and prints the frequency of each name in the console.
-*/
-int main(int argc, char *argv[])
+#include <unistd.h>
+#include <sys/wait.h>
+int countNamesInFile(char fileName[], char allFilesNames[1000][30], int allFilesNamesCount)
 {
-    for(int i = 0; i < argc-1; i*=2)
-    {
-        fork();
-    }
     //opens the file in read mode
-    if(argv[1] == NULL)
+    if(fileName == NULL)
     {
         return 0;
     }
     FILE *names;
-    names = fopen(argv[1], "r");
+    names = fopen(fileName, "r");
     //check if file exists
     if(names == NULL)
     {
-        fprintf(stderr, "Warning - File %s cannot be read or found\n", argv[0]);
+        fprintf(stderr, "Warning - File %s cannot be read or found\n", fileName);
         return 1;
     }
     //array for names and unique names
@@ -123,5 +116,31 @@ int main(int argc, char *argv[])
         printf("%s: %d\n", uniqueNames[i], uniqueNamesCounterArray[i]);
     }
     fclose(names);
+    return 0;
+}
+/**
+ * Main method that reads a txt file and reads all the names in the file. 
+ * The names are then counted one by one to see which names are outputted the most and prints the frequency of each name in the console.
+*/
+int main(int argc, char *argv[])
+{
+    int id;
+    char fileNames[100][100];
+    char allFilesNames[1000][30];
+    for(int i = 0; i < argc; i++)
+    {
+        strcpy(fileNames[i], argv[i]);
+    }
+    for(int i = 0; i < 6; i++)
+    {
+        int id = fork();
+        if(id == 0)
+        {
+            //countNamesInFile(fileNames[i], allFilesNames, 30);
+            printf("%d\n", 1);
+            return 0;
+        }
+    }
+
     return 0;
 }
