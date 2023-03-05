@@ -8,7 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
-int countNamesInFile(char fileName[], char allFilesNames[1000][30], int allFilesNamesCount)
+int countNamesInFile(char fileName[], char allFilesNames[1000][30], int allFilesNamesCount, int *fd[2])
 {
     //opens the file in read mode
     if(fileName == NULL)
@@ -131,12 +131,22 @@ int main(int argc, char *argv[])
     {
         strcpy(fileNames[i], argv[i+1]);
     }
+    int fd[(argc-1)*2];
+    for(int i = 0; i < argc-1; i+=2)
+    {
+        pipe(fd + i);
+    }
+    char* hi = "test";
+    char message[4];
+    write(fd[3], hi, 4);
+    read(fd[2], message, 4);
+    printf("%s", message);
     for(int i = 0; i < argc-1; i++)
     {
         int id = fork();
         if(id == 0)
         {
-            countNamesInFile(fileNames[i], allFilesNames, 30);
+            countNamesInFile(fileNames[i], allFilesNames, 30, fd[i*2]);
             return 0;
         }
     }
