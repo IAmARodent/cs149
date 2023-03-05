@@ -127,20 +127,22 @@ int main(int argc, char *argv[])
     int id;
     char fileNames[100][100];
     char allFilesNames[1000][30];
-    for(int i = 0; i < argc; i++)
+    for(int i = 0; i < argc - 1; i++)
     {
-        strcpy(fileNames[i], argv[i]);
+        strcpy(fileNames[i], argv[i+1]);
     }
-    for(int i = 0; i < 6; i++)
+    for(int i = 0; i < argc-1; i++)
     {
         int id = fork();
         if(id == 0)
         {
-            //countNamesInFile(fileNames[i], allFilesNames, 30);
-            printf("%d\n", 1);
+            countNamesInFile(fileNames[i], allFilesNames, 30);
             return 0;
         }
     }
-
+    while(wait(NULL) > 0)
+    {
+        //printf("waiting for child to terminate\n");
+    }
     return 0;
 }
