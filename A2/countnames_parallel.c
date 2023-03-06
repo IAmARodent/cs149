@@ -8,7 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
-int countNamesInFile(char fileName[], char allFilesNames[1000][30], int allFilesNamesCount, int *fd[2])
+int countNamesInFile(char fileName[], int fd1[2], int fd2[2])
 {
     //opens the file in read mode
     if(fileName == NULL)
@@ -116,6 +116,8 @@ int countNamesInFile(char fileName[], char allFilesNames[1000][30], int allFiles
         printf("%s: %d\n", uniqueNames[i], uniqueNamesCounterArray[i]);
     }
     fclose(names);
+    write(fd1[1], uniqueNames, sizeof(uniqueNames));
+    write(fd2[1], uniqueNamesCounterArray, sizeof(uniqueNamesCounterArray));
     return 0;
 }
 /**
@@ -126,33 +128,50 @@ int main(int argc, char *argv[])
 {
     int id;
     char fileNames[100][100];
-    char allFilesNames[1000][30];
+    
+    char allFilesNames[10000][30];
+    char nameBuffer[1000][30];
+
+    char allFilesCounter[10000];
+    char numberBuffer[1000];
+
     for(int i = 0; i < argc - 1; i++)
     {
         strcpy(fileNames[i], argv[i+1]);
+        printf("%d,%s\n", i, fileNames[i]);
     }
-    int fd[(argc-1)*2];
-    for(int i = 0; i < argc-1; i+=2)
+    int fdName[argc-1][2];
+    int fdNumber[argc-1][2];
+    for(int i = 0; i < argc-1; i++)
     {
-        pipe(fd + i);
+        pipe(fdName[i]);
+        pipe(fdNumber[i]);
     }
     char* hi = "test";
     char message[4];
-    write(fd[3], hi, 4);
-    read(fd[2], message, 4);
-    printf("%s", message);
+    //write(fd[1][1], hi, 4);
+    //read(fd[1][0], message, 4);
     for(int i = 0; i < argc-1; i++)
     {
         int id = fork();
         if(id == 0)
-        {
-            countNamesInFile(fileNames[i], allFilesNames, 30, fd[i*2]);
+        { //01 23 45 67 89 1011
+            countNamesInFile(fileNames[i], fdName[i], fdNumber[i]);
             return 0;
         }
     }
     while(wait(NULL) > 0)
     {
-        //printf("waiting for child to terminate\n");
+        printf("waiting for child to terminate\n");
+    }
+    for(int i = 0; i < argc-1; i++)
+    {
+        read(fdName[i][0],allFilesNames[i*1000],sizeof(nameBuffer));
+        read(fdNumber[i][0], allFilesCounter[i*1000], sizeof(numberBuffer));
+    }
+    for(int i = 0; i < 5; i++)
+    {
+        printf("%s %d\n",allFilesNames[i], allFilesCounter[i]);
     }
     return 0;
 }
