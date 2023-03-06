@@ -8,8 +8,13 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#define MAX_SUPPORTED_NAMES 1000
+#define MAX_SUPPORTED_NAMES 2000
 #define MAX_SUPPORTED_NAMES_PER_FILE 200
+/**
+ * Function that gets a file name and processes and counts all the names of a file.
+ * Param: fileName - name of file fd1 - name pipe fd2 - numbercounter pipe
+ * Return: 0 Success 1 Fail
+*/
 int countNamesInFile(char fileName[], int fd1[2], int fd2[2])
 {
     // opens the file in read mode
@@ -62,6 +67,7 @@ int countNamesInFile(char fileName[], int fd1[2], int fd2[2])
             else
             {
                 char tempLine[30];
+                memset(tempLine, 0, 30);
                 strncpy(tempLine, line, strlen(line) - 1);
                 strcpy(allNames[nameCounter], tempLine);
                 memset(tempLine, 0, 30);
@@ -113,34 +119,45 @@ int countNamesInFile(char fileName[], int fd1[2], int fd2[2])
         uniqueNamesCounterArray[i] = counter;
     }
     fclose(names);
+    //writes uniqueNames and UniqueNamesCounterArray to process pipes.
     write(fd1[1], uniqueNames, sizeof(uniqueNames));
     write(fd2[1], &uniqueNamesCounterArray, sizeof(uniqueNamesCounterArray));
     return 0;
 }
 /**
- * Main method that reads a txt file and reads all the names in the file.
- * The names are then counted one by one to see which names are outputted the most and prints the frequency of each name in the console.
+ * Main method that reads multiple txt files and outputs the count of each name in all files
+ * Each file is processed by its own process and each process outputs unique names and the times it happened.
+ * In the parent process it compiles all the information send by the children from pipes and gets the total for each name.
  */
 int main(int argc, char *argv[])
 {
+    //all file inputs
     char fileNames[100][100];
 
+    //for all names in each file
     char allFilesNames[MAX_SUPPORTED_NAMES][30];
     char nameBuffer[MAX_SUPPORTED_NAMES_PER_FILE][30];
 
+    //for all counters in each file
     int allFilesCounter[MAX_SUPPORTED_NAMES];
     int numberBuffer[MAX_SUPPORTED_NAMES_PER_FILE];
 
+    //for each calculation to compile the totals from each file
     char unique[MAX_SUPPORTED_NAMES][30];
     int uniqueCounter[MAX_SUPPORTED_NAMES];
     int uniqueNames;
+    
+    //gets all the files
     for (int i = 0; i < argc - 1; i++)
     {
         strcpy(fileNames[i], argv[i + 1]);
     }
+
     int numberOfReadableFiles = argc - 1;
     int readableFilesCount = 0;
     char readableFiles[100][100];
+    
+    //gets the readable files
     for (int i = 0; i < argc - 1; i++)
     {
         FILE *names;
@@ -157,11 +174,8 @@ int main(int argc, char *argv[])
             readableFilesCount++;
         }
     }
-    for (int i = 0; i < numberOfReadableFiles; i++)
-    {
-        printf("%s\n", readableFiles[i]);
-    }
-    printf("%d\n", numberOfReadableFiles);
+
+    //creates pipes based on how many files one for names and one for numbers
     int fdName[numberOfReadableFiles][2];
     int fdNumber[numberOfReadableFiles][2];
     for (int i = 0; i < numberOfReadableFiles; i++)
@@ -169,28 +183,36 @@ int main(int argc, char *argv[])
         pipe(fdName[i]);
         pipe(fdNumber[i]);
     }
-    for (int i = 0; i < numberOfReadableFiles; i++)
-    {
-        int id = fork();
-        if (id == 0)
-        { // 01 23 45 67 89 1011
-            countNamesInFile(readableFiles[i], fdName[i], fdNumber[i]);
-            return 0;
-        }
-    }
+    //if there are no files 
     if (numberOfReadableFiles == 0)
     {
         return 0;
+    }
+    //creates a child process for each file
+    for (int i = 0; i < numberOfReadableFiles; i++)
+    { 
+        int id = fork(); //forks parallelly with the amoutn of number of ReadableFiles
+        if (id == 0) //child process
+        { 
+            countNamesInFile(readableFiles[i], fdName[i], fdNumber[i]);
+            return 0;
+        }
     }
     while (wait(NULL) > 0)
     {
         // printf("waiting for child to terminate\n");
     }
+    //gets the information from each process
     for (int i = 0; i < numberOfReadableFiles; i++)
     {
         read(fdName[i][0], allFilesNames[i * MAX_SUPPORTED_NAMES_PER_FILE], sizeof(nameBuffer));
         read(fdNumber[i][0], &allFilesCounter[i * MAX_SUPPORTED_NAMES_PER_FILE], sizeof(numberBuffer));
+        close(fdName[i][0]);
+        close(fdNumber[i][0]);
+        close(fdName[i][1]);
+        close(fdNumber[i][1]);
     }
+    //nulls out the master array with all names in order to avoid errors
     for (int i = 0; i < MAX_SUPPORTED_NAMES; i += 200)
     {
         for (int j = 100 + i; j < MAX_SUPPORTED_NAMES_PER_FILE + i; j++)
@@ -198,7 +220,8 @@ int main(int argc, char *argv[])
             strcpy(allFilesNames[j], "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0");
         }
     }
-
+    //goes through each name and checks the master name array and if it matches it will add the amount to a count and associate it with that name
+    //and adds it to a unique array with only unique names
     for (int i = 0; i < MAX_SUPPORTED_NAMES; i++) // goes through allFilesNames array
     {
         int exists = 1;
@@ -215,7 +238,6 @@ int main(int argc, char *argv[])
         if (exists == 1) // if name does not exist in unique
         {
             int count = 0;
-            printf("%s index of allnames%d\n", current, i);
             strcpy(unique[uniqueNames], current);         // put current name in unique array
             for (int j = i; j < MAX_SUPPORTED_NAMES; j++) // check each name in allFilesNames and add value to count
             {
@@ -228,9 +250,10 @@ int main(int argc, char *argv[])
             uniqueNames++;                      // increment amount of unique names
         }
     }
+    //prints out the output
     for (int i = 0; i < uniqueNames; i++)
     {
-        printf("%s %d\n", unique[i], uniqueCounter[i]);
+        printf("%s: %d\n", unique[i], uniqueCounter[i]);
     }
     return 0;
 }
